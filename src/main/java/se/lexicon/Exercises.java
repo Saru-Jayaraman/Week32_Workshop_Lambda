@@ -7,7 +7,6 @@ import se.lexicon.model.Person;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -164,8 +163,7 @@ public class Exercises {
             else
                 return 0;
         };
-        List<Person> result = storage.findAndSort(predicate, comparator);
-        System.out.println(result);
+        storage.findAndSort(predicate, comparator).forEach(System.out::println);
 
         System.out.println("----------------------");
     }
@@ -184,8 +182,7 @@ public class Exercises {
             else
                 return 0;
         };
-        List<Person> result = storage.findAndSort(predicate, comparator);
-        System.out.println(result);
+        storage.findAndSort(predicate, comparator).forEach(System.out::println);
 
         System.out.println("----------------------");
     }
@@ -197,8 +194,7 @@ public class Exercises {
         System.out.println(message);
         Comparator<Person> comparator = Comparator.comparing(Person::getLastName).thenComparing(Person::getFirstName).
                 thenComparing(Person::getBirthDate);
-        List<Person> result = storage.findAndSort(comparator);
-        System.out.println(result);
+        storage.findAndSort(comparator).forEach(System.out::println);
 
         System.out.println("----------------------");
     }
