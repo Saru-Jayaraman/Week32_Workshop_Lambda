@@ -5,6 +5,7 @@ import se.lexicon.model.Gender;
 import se.lexicon.model.Person;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,9 +21,8 @@ public class Exercises {
     */
     public static void exercise1(String message) {
         System.out.println(message);
-        Predicate<Person> predicate = (person) -> person.getFirstName().equalsIgnoreCase("Erik");
-        List<Person> result = storage.findMany(predicate);
-        System.out.println(result);
+        Predicate<Person> predicate = person -> person.getFirstName().equalsIgnoreCase("Erik");
+        storage.findMany(predicate).forEach(System.out::println);
 
         System.out.println("----------------------");
     }
@@ -32,9 +32,8 @@ public class Exercises {
      */
     public static void exercise2(String message) {
         System.out.println(message);
-        Predicate<Person> predicate = (person) -> person.getGender().equals(Gender.FEMALE);
-        List<Person> result = storage.findMany(predicate);
-        System.out.println(result);
+        Predicate<Person> predicate = person -> person.getGender().equals(Gender.FEMALE);
+        storage.findMany(predicate).forEach(System.out::println);
 
         System.out.println("----------------------");
     }
@@ -44,9 +43,8 @@ public class Exercises {
      */
     public static void exercise3(String message) {
         System.out.println(message);
-        Predicate<Person> predicate = (person) -> person.getBirthDate().isAfter(LocalDate.of(2000,1,1).minusDays(1));
-        List<Person> result = storage.findMany(predicate);
-        System.out.println(result);
+        Predicate<Person> predicate = person -> person.getBirthDate().isAfter(LocalDate.of(2000,1,1).minusDays(1));
+        storage.findMany(predicate).forEach(System.out::println);
 
         System.out.println("----------------------");
     }
@@ -58,7 +56,10 @@ public class Exercises {
         System.out.println(message);
         Predicate<Person> predicate = (person) -> person.getId() == 123;
         Person result = storage.findOne(predicate);
-        System.out.println(result);
+        if(result != null)
+            System.out.println(result);
+        else
+            System.out.println("Id not found...");
 
         System.out.println("----------------------");
 
@@ -71,10 +72,13 @@ public class Exercises {
     public static void exercise5(String message) {
         System.out.println(message);
         Predicate<Person> predicate = (person) -> person.getId() == 456;
-        Function<Person, String> personToString = (person) -> "Name: ".concat(person.getFirstName()).concat(" ").concat(person.getLastName()).
-                    concat(" born ").concat(String.valueOf(person.getBirthDate()));
-        String result = storage.findOneAndMapToString(predicate, personToString);
-        System.out.println(result);
+        Function<Person, String> personToString = (person) -> String.format("Name: %s %s born %s",
+                person.getFirstName(), person.getLastName(), person.getBirthDate());
+        Person result = storage.findOne(predicate);
+        if(result != null)
+            System.out.println(storage.findOneAndMapToString(predicate, personToString));
+        else
+            System.out.println("Id not found...");
 
         System.out.println("----------------------");
     }
@@ -85,9 +89,8 @@ public class Exercises {
     public static void exercise6(String message) {
         System.out.println(message);
         Predicate<Person> predicate = (person) -> person.getGender().equals(Gender.MALE) && person.getFirstName().startsWith("E");
-        Function<Person, String> personToString = (person) -> person.toString();
-        List<String> result = storage.findManyAndMapEachToString(predicate, personToString);
-        System.out.println(result);
+        Function<Person, String> personToString = Person::toString;
+        storage.findManyAndMapEachToString(predicate, personToString).forEach(System.out::println);
 
         System.out.println("----------------------");
     }
@@ -99,18 +102,14 @@ public class Exercises {
     public static void exercise7(String message) {
         System.out.println(message);
         Predicate<Person> predicate = (person) -> {
-            long age = LocalDate.now().getYear() - person.getBirthDate().getYear();
+            int age = Period.between(person.getBirthDate(), LocalDate.now().plusDays(1)).getYears();
             return age < 10;
         };
         Function<Person, String> personToString = (person) -> {
-            String details = "";
-            long age = LocalDate.now().getYear() - person.getBirthDate().getYear();
-            details = details.concat(person.getFirstName()).concat(" ").concat(person.getLastName()).
-                    concat(" ").concat(String.valueOf(age)).concat(" years");
-            return details;
+            int age = Period.between(person.getBirthDate(), LocalDate.now().plusDays(1)).getYears();
+            return String.format("%s %s %d years", person.getFirstName(), person.getLastName(), age);
         };
-        List<String> result = storage.findManyAndMapEachToString(predicate, personToString);
-        System.out.println(result);
+        storage.findManyAndMapEachToString(predicate, personToString).forEach(System.out::println);
 
         System.out.println("----------------------");
     }
@@ -121,7 +120,7 @@ public class Exercises {
     public static void exercise8(String message) {
         System.out.println(message);
         Predicate<Person> predicate = (person) -> person.getFirstName().equalsIgnoreCase("Ulf");
-        Consumer<Person> consumer = (person) -> System.out.println(person);
+        Consumer<Person> consumer = System.out::println;
         storage.findAndDo(predicate, consumer);
 
         System.out.println("----------------------");
@@ -133,7 +132,7 @@ public class Exercises {
     public static void exercise9(String message) {
         System.out.println(message);
         Predicate<Person> predicate = (person) -> person.getLastName().contains(person.getFirstName());
-        Consumer<Person> consumer = (person) -> System.out.println(person);
+        Consumer<Person> consumer = System.out::println;
         storage.findAndDo(predicate, consumer);
 
         System.out.println("----------------------");
@@ -144,11 +143,7 @@ public class Exercises {
      */
     public static void exercise10(String message) {
         System.out.println(message);
-        Predicate<Person> predicate = (person) -> {
-            StringBuilder sb = new StringBuilder(person.getFirstName());
-            sb.reverse();
-            return person.getFirstName().equalsIgnoreCase(sb.toString());
-        };
+        Predicate<Person> predicate = (person) -> person.getFirstName().equalsIgnoreCase(new StringBuilder(person.getFirstName()).reverse().toString());
         Consumer<Person> consumer = (person) -> System.out.println(person.getFirstName().concat(" ").concat(person.getLastName()));
         storage.findAndDo(predicate, consumer);
 
