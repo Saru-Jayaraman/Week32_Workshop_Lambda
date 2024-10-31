@@ -1,12 +1,12 @@
-# Lambda Practice
+# Lambda Practice Exercises
 
 
 
 ### Java.util.function instructions:
-First you create implementations inside DataStorageImpl. I “forgot” to remove one
-implementation this might help you get started .  
+First you create implementations inside DataStorageImpl. I “forgot” to remove one implementation this might help you get started.  
 After implementations are done you can do the following exercises from the Exercises class.  
-You need to define the lambda expressions cleverly to succeed.  
+You need to define the lambda expressions cleverly to succeed.
+
 1. -[x] Find everyone that has firstName: “Erik” using findMany().
 2. -[x] Find all females in the collection using findMany().
 3. -[x] Find all who are born after (and including) 2000-01-01 using findMany().
